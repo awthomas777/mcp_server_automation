@@ -1,0 +1,1 @@
+This repo involves a custom mcp server related to various on demand queries initiated from a discord server that will use AI model(s) to conduct collection, research and analysis of data based on a keyword used.
