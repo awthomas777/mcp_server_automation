@@ -99,7 +99,7 @@ sleep 3
 
 if kill -0 "$MCP_PID" 2>/dev/null; then
     echo "[$(date)] MCP server confirmed running (PID $MCP_PID)." >> "$LOG_FILE"
-    echo "[$(date)] Access at: http://$(hostname -I | awk '{print $1}'):${MCP_PORT:-9000}/mcp" >> "$LOG_FILE"
+    echo "[$(date)] Access at: http://${MCP_HOST}:${MCP_PORT:-9000}/mcp" >> "$LOG_FILE"
 else
     echo "[$(date)] ERROR: MCP server died immediately after launch. Check the log above for Python errors." >> "$LOG_FILE"
     exit 1
