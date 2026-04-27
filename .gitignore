@@ -1,0 +1,5 @@
+mcp.env
+.env
+*.env
+!mcp.env.template
+__pycache__/
