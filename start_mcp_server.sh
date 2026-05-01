@@ -43,7 +43,7 @@
 # Update these paths if you move the directory.
 ENV_FILE="/volume1/Misc/scripts/mcp_server/mcp.env"
 SERVER_SCRIPT="/volume1/Misc/scripts/mcp_server/synology_mcp_server.py"
-LOG_FILE="/volume1/Misc/logs/mcp_server/mcp_server.log"
+LOG_FILE="/volume1/Misc/logs/mcp_server.log"
 
 # Full path to Python 3.11 installed via SynoCommunity.
 # Verify with: which python3.11
@@ -67,10 +67,10 @@ set +a
 mkdir -p "$(dirname "$LOG_FILE")"
 
 # ── Check if already running ──────────────────────────────────────────────────
-# pgrep searches running processes for a matching pattern.
-# If it finds synology_mcp_server.py already running, we exit cleanly.
+# pgrep is not available on Synology — use ps | grep instead.
+# grep -v grep excludes the grep process itself from results.
 # This makes the script safe to run on boot AND as an hourly health check.
-if pgrep -f "synology_mcp_server.py" > /dev/null 2>&1; then
+if ps aux | grep "synology_mcp_server.py" | grep -v grep > /dev/null 2>&1; then
     echo "[$(date)] MCP server is already running. Nothing to do." >> "$LOG_FILE"
     exit 0
 fi
@@ -99,7 +99,7 @@ sleep 3
 
 if kill -0 "$MCP_PID" 2>/dev/null; then
     echo "[$(date)] MCP server confirmed running (PID $MCP_PID)." >> "$LOG_FILE"
-    echo "[$(date)] Access at: http://${MCP_HOST}:${MCP_PORT:-9000}/mcp" >> "$LOG_FILE"
+    echo "[$(date)] Access at: http://$(hostname -I | awk '{print $1}'):${MCP_PORT:-9000}/mcp" >> "$LOG_FILE"
 else
     echo "[$(date)] ERROR: MCP server died immediately after launch. Check the log above for Python errors." >> "$LOG_FILE"
     exit 1

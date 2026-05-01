@@ -218,7 +218,7 @@ def build_tasks(lookback_hours: int) -> dict:
             "system_prompt": (
                 "You are a cloud security analyst. You have tools to query Azure Sentinel, "
                 "create JIRA tickets, and post to Discord. "
-                "Be concise and data-driven. Focus on unique IPs and top hitters."
+                "Be concise and data-driven. Focus on unique IPs and top hitters. Make no assumptions."
             ),
             "user_prompt": (
                 f"Query both cloud VM logs for the past {lookback_hours} hours "
@@ -273,13 +273,7 @@ def build_tasks(lookback_hours: int) -> dict:
                 "   - Gold price trend over the past 7 days\n"
                 "   - Top 2-3 recent news articles on gold (last 7 days)\n"
                 "   - Economic indicators relevant to gold (USD strength, inflation data, Fed rates)\n"
-                "   - Any analyst projections or forecasts on gold direction\n"
-                "2. Post a Discord summary covering:\n"
-                "   - Current spot price and 7-day change (up/down %)\n"
-                "   - 2-3 bullet points on key economic factors driving price\n"
-                "   - Analyst sentiment: bullish / bearish / neutral with one-line reason\n"
-                "   - 1-2 notable headlines with source names\n"
-                "   Keep it under 20 lines. Use 📈 or 📉 where appropriate."
+                "2. Post a Discord summary covering all the of the content found in the web search. Please provide 4 bullet points with the spot price, the 7 day trend, and two or three top economic indicators. Link the sources in the discord output.\n"
             )
         },
 
@@ -287,22 +281,17 @@ def build_tasks(lookback_hours: int) -> dict:
         # Web search for FZROX and FZILX current prices and performance data.
         "fidelity": {
             "system_prompt": (
-                "You are a personal finance analyst specializing in index funds. "
+                "You are a personal finance analyst specializing in index funds. You are particularly skilled in prediction markets and long-term investing strategy."
                 "You have tools to search the web and post to Discord. "
-                "Be factual, concise, and avoid giving personalized financial advice."
+                "Be factual, concise, and only provide objective analysis on the data collected with no assumptions made."
             ),
             "user_prompt": (
                 "Research the current performance of two Fidelity ZERO index funds:\n"
-                "1. Search the web for current data on FZROX (Fidelity ZERO Total Market Index Fund):\n"
-                "   - Current NAV/price\n"
+                "1. Search the web for current data on FZROX (Fidelity ZERO Total Market Index Fund) and FZILX (Fidelity ZERO International Index Fund):\n"
+                "   - Current NAV/price of both index funds\n"
                 "   - Recent performance (1 week, YTD if available)\n"
                 "   - 2 bullet points on public performance projections or economic indicators\n"
                 "     relevant to US total market funds (GDP, earnings season, Fed policy)\n"
-                "2. Search the web for current data on FZILX (Fidelity ZERO International Index Fund):\n"
-                "   - Current NAV/price\n"
-                "   - Recent performance (1 week, YTD if available)\n"
-                "   - 2 bullet points on public performance projections or economic indicators\n"
-                "     relevant to international funds (USD strength, emerging markets, geopolitics)\n"
                 "3. Post a Discord summary structured as:\n"
                 "   **FZROX** (US Total Market)\n"
                 "   - Price: $X.XX | 1W: +/-X% | YTD: +/-X%\n"
@@ -312,7 +301,7 @@ def build_tasks(lookback_hours: int) -> dict:
                 "   - Price: $X.XX | 1W: +/-X% | YTD: +/-X%\n"
                 "   - [bullet 1]\n"
                 "   - [bullet 2]\n\n"
-                "   Keep the total post under 20 lines."
+                "   Keep the total post under 10 lines."
             )
         },
     }
@@ -399,7 +388,7 @@ async def _agent_loop(session, system_prompt: str, user_prompt: str, model: str,
             try:
                 response = client.messages.create(
                     model=model,
-                    max_tokens=4096,
+                    max_tokens=8192,
                     system=system_prompt,
                     tools=anthropic_tools,
                     messages=messages

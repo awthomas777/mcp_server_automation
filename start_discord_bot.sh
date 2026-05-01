@@ -20,10 +20,11 @@
 #   bash /volume1/Misc/scripts/mcp_server/start_discord_bot.sh
 #
 # HOW TO STOP:
-#   pkill -f discord_bot.py
+#   kill $(ps | grep discord_bot.py | grep -v grep | awk '{print $1}')
 #
 # HOW TO CHECK IF RUNNING:
-#   pgrep -f discord_bot.py && echo "Running" || echo "Not running"
+#   ps | grep discord_bot.py
+#   (if you see a line without the word 'grep' in it, the bot is running)
 #
 # HOW TO CHECK LOGS:
 #   tail -f /volume1/Misc/logs/discord_bot.log
@@ -48,7 +49,9 @@ set +a
 mkdir -p "$(dirname "$LOG_FILE")"
 
 # ── Check if already running ──────────────────────────────────────────────────
-if pgrep -f "discord_bot.py" > /dev/null 2>&1; then
+# pgrep is not available on Synology — use ps | grep instead.
+# grep -v grep excludes the grep process itself from results.
+if ps aux | grep "discord_bot.py" | grep -v grep > /dev/null 2>&1; then
     echo "[$(date)] Discord bot is already running. Nothing to do." >> "$LOG_FILE"
     exit 0
 fi

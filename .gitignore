@@ -6,3 +6,4 @@ __pycache__/
 *.log
 *.pyc
 how_to.txt
+.last_run_times.json
